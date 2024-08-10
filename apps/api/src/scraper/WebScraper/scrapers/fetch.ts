@@ -12,7 +12,7 @@ import { Logger } from "../../../lib/logger";
  */
 export async function scrapWithFetch(
   url: string,
-  pageOptions: { parsePDF?: boolean } = { parsePDF: true }
+  pageOptions: { parsePDF?: boolean, headers?: Record<string, string> } = { parsePDF: true }
 ): Promise<{ content: string; pageStatusCode?: number; pageError?: string }> {
   const logParams = {
     url,
@@ -27,9 +27,7 @@ export async function scrapWithFetch(
 
   try {
     const response = await axios.get(url, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: pageOptions.headers,
       timeout: universalTimeout,
       transformResponse: [(data) => data], // Prevent axios from parsing JSON automatically
     });

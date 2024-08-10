@@ -37,7 +37,7 @@ export const baseScrapers = [
 export async function generateRequestParams(
   url: string,
   wait_browser: string = "domcontentloaded",
-  timeout: number = 15000
+  timeout: number = 60000
 ): Promise<any> {
   const defaultParams = {
     url: url,
@@ -220,7 +220,7 @@ export async function scrapSingleUrl(
         }
         break;
       case "fetch":
-        const response = await scrapWithFetch(url);
+        const response = await scrapWithFetch(url, { headers: pageOptions.headers });
         scraperResponse.text = response.content;
         scraperResponse.metadata.pageStatusCode = response.pageStatusCode;
         scraperResponse.metadata.pageError = response.pageError;
