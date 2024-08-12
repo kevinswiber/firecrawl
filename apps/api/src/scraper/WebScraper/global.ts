@@ -1,1 +1,2 @@
-export const universalTimeout = 15000;
+export const universalTimeout = 5 * 60000;
+

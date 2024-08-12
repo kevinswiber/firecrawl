@@ -37,7 +37,7 @@ export const baseScrapers = [
 export async function generateRequestParams(
   url: string,
   wait_browser: string = "domcontentloaded",
-  timeout: number = 60000
+  timeout: number = 5 * 60000
 ): Promise<any> {
   const defaultParams = {
     url: url,
