@@ -120,7 +120,6 @@ function getScrapingFallbackOrder(
 }
 
 
-
 export async function scrapSingleUrl(
   jobId: string,
   urlToScrap: string,
@@ -132,6 +131,7 @@ export async function scrapSingleUrl(
     screenshot: false,
     fullPageScreenshot: false,
     headers: undefined,
+    storageState: undefined,
   },
   extractorOptions: ExtractorOptions = {
     mode: "llm-extraction-from-markdown",
@@ -204,7 +204,8 @@ export async function scrapSingleUrl(
           const response = await scrapWithPlaywright(
             url,
             pageOptions.waitFor,
-            pageOptions.headers
+            pageOptions.headers,
+            pageOptions.storageState,
           );
           scraperResponse.text = response.content;
           scraperResponse.metadata.pageStatusCode = response.pageStatusCode;
@@ -362,6 +363,7 @@ export async function scrapSingleUrl(
     let linksOnPage: string[] | undefined;
 
     linksOnPage = extractLinks(rawHtml, urlToScrap);
+    Logger.debug(`Links on page: ${Array.from(linksOnPage).join("\n")}`);
 
     let document: Document;
     if (screenshot && screenshot.length > 0) {

@@ -48,6 +48,8 @@ export function extractLinks(html: string, baseUrl: string): string[] {
       } else if (href.startsWith('mailto:')) {
         // mailto: links, add as is
         links.push(href);
+      } else {
+        links.push(`${baseUrl}/${href}`);
       }
       // Fragment-only links (#) are ignored
     }

@@ -1,5 +1,5 @@
 name: firecrawl
-version: '3.9'
+version: "3.9"
 
 x-common-service: &common-service
   build: apps/api
@@ -30,12 +30,10 @@ x-common-service: &common-service
     - HOST=${HOST:-0.0.0.0}
     - SELF_HOSTED_WEBHOOK_URL=${SELF_HOSTED_WEBHOOK_URL}
     - LOGGING_LEVEL=${LOGGING_LEVEL}
-  extra_hosts:
-    - "host.docker.internal:host-gateway"
 
 services:
   playwright-service:
-    build: apps/playwright-service
+    build: apps/playwright-service-ts
     environment:
       - PORT=3000
       - PROXY_SERVER=${PROXY_SERVER}
@@ -52,7 +50,7 @@ services:
       - playwright-service
     ports:
       - "3002:3002"
-    command: [ "pnpm", "run", "start:production" ]
+    command: ["pnpm", "run", "start:production"]
 
   worker:
     <<: *common-service
@@ -60,7 +58,7 @@ services:
       - redis
       - playwright-service
       - api
-    command: [ "pnpm", "run", "workers" ]
+    command: ["pnpm", "run", "workers"]
 
   redis:
     image: redis:alpine

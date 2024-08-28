@@ -296,7 +296,7 @@ export class WebCrawler {
 
           if (this.isInternalLink(fullUrl)) { // INTERNAL LINKS
             if (this.isInternalLink(fullUrl) &&
-              this.noSections(fullUrl) &&
+              //this.noSections(fullUrl) &&
               !this.matchesExcludes(path) &&
               this.isRobotsAllowed(fullUrl)
             ) {

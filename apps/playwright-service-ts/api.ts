@@ -34,11 +34,36 @@ const AD_SERVING_DOMAINS = [
   'amazon-adsystem.com'
 ];
 
+interface Cookie {
+  name: string;
+  value: string;
+  domain: string;
+  path: string;
+  expires: number;
+  httpOnly: boolean;
+  secure: boolean;
+  sameSite: 'Strict' | 'Lax' | 'None';
+}
+
+interface Origin {
+  origin: string;
+  localStorage: {
+    name: string;
+    value: string;
+  }[];
+}
+
+interface StorageState {
+  cookies: Cookie[];
+  origins: Origin[];
+}
+
 interface UrlModel {
   url: string;
   wait_after_load?: number;
   timeout?: number;
   headers?: { [key: string]: string };
+  storage_state?: StorageState;
   check_selector?: string;
 }
 
@@ -142,13 +167,14 @@ const scrapePage = async (page: any, url: string, waitUntil: 'load' | 'networkid
 };
 
 app.post('/scrape', async (req: Request, res: Response) => {
-  const { url, wait_after_load = 0, timeout = 15000, headers, check_selector }: UrlModel = req.body;
+  const { url, wait_after_load = 0, timeout = 15000, headers, storage_state, check_selector }: UrlModel = req.body;
 
   console.log(`================= Scrape Request =================`);
   console.log(`URL: ${url}`);
   console.log(`Wait After Load: ${wait_after_load}`);
   console.log(`Timeout: ${timeout}`);
   console.log(`Headers: ${headers ? JSON.stringify(headers) : 'None'}`);
+  console.log(`Storage State: ${storage_state ? JSON.stringify(storage_state) : 'None'}`);
   console.log(`Check Selector: ${check_selector ? check_selector : 'None'}`);
   console.log(`==================================================`);
 
@@ -168,12 +194,22 @@ app.post('/scrape', async (req: Request, res: Response) => {
     await initializeBrowser();
   }
 
-  const page = await context.newPage();
-
   // Set headers if provided
   if (headers) {
-    await page.setExtraHTTPHeaders(headers);
+    await context.setExtraHTTPHeaders(headers);
   }
+
+  if (storage_state) {
+    await context.addCookies(storage_state.cookies);
+    const initScript = storage_state.origins[0].localStorage.reduce((prev, cur) => {
+      prev += `window.localStorage.setItem("${cur.name}", "${cur.value}");\n`;
+      return prev;
+    }, "");
+    await context.addInitScript({ content: initScript });
+  }
+
+  const page = await context.newPage();
+
 
   let pageContent;
   let pageStatusCode: number | null = null;

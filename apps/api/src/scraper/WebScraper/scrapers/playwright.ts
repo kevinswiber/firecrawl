@@ -4,6 +4,7 @@ import { generateRequestParams } from "../single_url";
 import { fetchAndProcessPdf } from "../utils/pdfProcessor";
 import { universalTimeout } from "../global";
 import { Logger } from "../../../lib/logger";
+import type { StorageState } from "../../../lib/entities";
 
 /**
  * Scrapes a URL with Playwright
@@ -17,6 +18,7 @@ export async function scrapWithPlaywright(
   url: string,
   waitFor: number = 0,
   headers?: Record<string, string>,
+  storageState: StorageState = { cookies: [], origins: [] },
   pageOptions: { parsePDF?: boolean } = { parsePDF: true }
 ): Promise<{ content: string; pageStatusCode?: number; pageError?: string }> {
   const logParams = {
@@ -41,6 +43,7 @@ export async function scrapWithPlaywright(
         url: url,
         wait_after_load: waitParam,
         headers: headers,
+        storage_state: storageState,
       },
       {
         headers: {
