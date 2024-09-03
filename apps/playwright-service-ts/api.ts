@@ -201,11 +201,13 @@ app.post('/scrape', async (req: Request, res: Response) => {
 
   if (storage_state) {
     await context.addCookies(storage_state.cookies);
-    const initScript = storage_state.origins[0].localStorage.reduce((prev, cur) => {
+    const initScript = storage_state?.origins?.[0]?.localStorage.reduce((prev, cur) => {
       prev += `window.localStorage.setItem("${cur.name}", "${cur.value}");\n`;
       return prev;
     }, "");
-    await context.addInitScript({ content: initScript });
+    if (initScript && initScript.length > 0) {
+      await context.addInitScript({ content: initScript });
+    }
   }
 
   const page = await context.newPage();

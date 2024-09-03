@@ -72,6 +72,29 @@ export const scrapeOptions = z.object({
   waitFor: z.number().int().nonnegative().finite().safe().default(0),
   extract: extractOptions.optional(),
   parsePDF: z.boolean().default(true),
+  storageState: z.object({
+    cookies: z.array(
+      z.object({
+          name: z.string(),
+          value: z.string(),
+          domain: z.string(),
+          path: z.string(),
+          expires: z.number(),
+          httpOnly: z.boolean(),
+          secure: z.boolean(),
+          sameSite: z.enum(["Strict", "Lax", "None"]),
+      })),
+    origins: z.array(
+      z.object({
+        origin: z.string(),
+        localStorage: z.array(
+          z.object({
+            name: z.string(),
+            value: z.string(),
+          })
+        ),
+      }))
+  }).optional(),
 }).strict(strictMessage)
 
 
@@ -326,6 +349,7 @@ export function legacyScrapeOptions(x: ScrapeOptions): PageOptions {
     screenshot: x.formats.includes("screenshot"),
     fullPageScreenshot: x.formats.includes("screenshot@fullPage"),
     parsePDF: x.parsePDF,
+    storageState: x.storageState,
   };
 }
 

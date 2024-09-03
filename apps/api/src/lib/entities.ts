@@ -155,25 +155,25 @@ export interface FireEngineOptions{
 }
 
 export interface Cookie {
-  name: string;
-  value: string;
-  domain: string;
-  path: string;
-  expires: number;
-  httpOnly: boolean;
-  secure: boolean;
-  sameSite: 'Strict' | 'Lax' | 'None';
+  name?: string;
+  value?: string;
+  domain?: string;
+  path?: string;
+  expires?: number;
+  httpOnly?: boolean;
+  secure?: boolean;
+  sameSite?: 'Strict' | 'Lax' | 'None';
 }
 
 export interface Origin {
-  origin: string;
-  localStorage: {
-    name: string;
-    value: string;
+  origin?: string;
+  localStorage?: {
+    name?: string;
+    value?: string;
   }[];
 }
 
 export interface StorageState {
-  cookies: Cookie[];
-  origins: Origin[];
+  cookies?: Cookie[];
+  origins?: Origin[];
 }
