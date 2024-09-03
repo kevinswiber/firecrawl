@@ -1,4 +1,4 @@
-import { Job, JobId } from "bull";
+import { Job } from "bullmq";
 import type { baseScrapers } from "../scraper/WebScraper/single_url";
 import { supabase_service as supabase } from "../services/supabase";
 import { Logger } from "./logger";
@@ -36,7 +36,8 @@ export class ScrapeEvents {
   static async insert(jobId: string, content: ScrapeEvent) {
     if (jobId === "TEST") return null;
     
-    if (process.env.USE_DB_AUTHENTICATION) {
+    const useDbAuthentication = process.env.USE_DB_AUTHENTICATION === 'true';
+    if (useDbAuthentication) {
       try {
         const result = await supabase.from("scrape_events").insert({
           job_id: jobId,
@@ -70,7 +71,7 @@ export class ScrapeEvents {
     }
   }
 
-  static async logJobEvent(job: Job | JobId, event: ScrapeQueueEvent["event"]) {
+  static async logJobEvent(job: Job | any, event: ScrapeQueueEvent["event"]) {
     try {
       await this.insert(((job as any).id ? (job as any).id : job) as string, {
         type: "queue",
