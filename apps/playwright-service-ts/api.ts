@@ -69,9 +69,11 @@ interface UrlModel {
 
 let browser: Browser;
 let context: BrowserContext;
+let isStartingUp = false;
 let isShuttingDown = false;
 
 const initializeBrowser = async () => {
+  isStartingUp = true;
   browser = await chromium.launch({
     headless: true,
     args: [
@@ -87,7 +89,7 @@ const initializeBrowser = async () => {
   });
 
   browser.once("disconnected", () => {
-    if (!isShuttingDown) {
+    if (!isStartingUp && !isShuttingDown) {
       console.log("Browser disconnected unexpectedly. Reinitializing browser.");
       initializeBrowser();
     }
@@ -114,6 +116,12 @@ const initializeBrowser = async () => {
   }
 
   context = await browser.newContext(contextOptions);
+  context.once("close", () => {
+    if (!isStartingUp && !isShuttingDown) {
+      console.log("Context closed unexpectedly. Reinitializing browser.");
+      initializeBrowser();
+    }
+  });
 
   if (BLOCK_MEDIA) {
     await context.route('**/*.{png,jpg,jpeg,gif,svg,mp3,mp4,avi,flac,ogg,wav,webm}', async (route: Route, request: PlaywrightRequest) => {
