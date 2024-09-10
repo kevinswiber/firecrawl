@@ -288,7 +288,7 @@ export class WebCrawler {
 
     if (this.isInternalLink(fullUrl)) { // INTERNAL LINKS
       if (this.isInternalLink(fullUrl) &&
-        //this.noSections(fullUrl) &&
+        this.noSections(urlObj) &&
         !this.matchesExcludes(path) &&
         this.isRobotsAllowed(fullUrl)
       ) {
@@ -437,8 +437,9 @@ export class WebCrawler {
       return !Boolean(url.split("/").slice(3).filter(subArray => subArray.length > 0).length)
   }
 
-  private noSections(link: string): boolean {
-    return !link.includes("#");
+  private noSections(urlObj: URL): boolean {
+    const { hash } = urlObj;
+    return hash === "" || hash.startsWith("#/");
   }
 
   private isInternalLink(link: string): boolean {

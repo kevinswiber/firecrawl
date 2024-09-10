@@ -69,6 +69,7 @@ interface UrlModel {
 
 let browser: Browser;
 let context: BrowserContext;
+let isShuttingDown = false;
 
 const initializeBrowser = async () => {
   browser = await chromium.launch({
@@ -83,6 +84,13 @@ const initializeBrowser = async () => {
       '--single-process',
       '--disable-gpu'
     ]
+  });
+
+  browser.once("disconnected", () => {
+    if (!isShuttingDown) {
+      console.log("Browser disconnected unexpectedly. Reinitializing browser.");
+      initializeBrowser();
+    }
   });
 
   const userAgent = randomUseragent.getRandom();
@@ -127,6 +135,12 @@ const initializeBrowser = async () => {
 };
 
 const shutdownBrowser = async () => {
+  if (isShuttingDown) {
+    return;
+  }
+
+  isShuttingDown = true;
+
   if (context) {
     await context.close();
   }
@@ -169,12 +183,14 @@ const scrapePage = async (page: any, url: string, waitUntil: 'load' | 'networkid
 app.post('/scrape', async (req: Request, res: Response) => {
   const { url, wait_after_load = 0, timeout = 15000, headers, storage_state, check_selector }: UrlModel = req.body;
 
+  const cookiesCount = storage_state?.cookies?.length || 0;
+  const originsCount = storage_state?.origins?.length || 0;
   console.log(`================= Scrape Request =================`);
   console.log(`URL: ${url}`);
   console.log(`Wait After Load: ${wait_after_load}`);
   console.log(`Timeout: ${timeout}`);
   console.log(`Headers: ${headers ? JSON.stringify(headers) : 'None'}`);
-  console.log(`Storage State: ${storage_state ? JSON.stringify(storage_state) : 'None'}`);
+  console.log(`Storage State: ${storage_state ? `Cookies: ${cookiesCount}, Origins: ${originsCount}` : 'None'}`);
   console.log(`Check Selector: ${check_selector ? check_selector : 'None'}`);
   console.log(`==================================================`);
 
