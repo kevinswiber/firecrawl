@@ -274,6 +274,9 @@ export class WebCrawler {
     if (!href.startsWith("http")) {
       try {
         fullUrl = new URL(href, this.baseUrl).toString();
+        if (fullUrl.endsWith("#")) {
+          fullUrl = fullUrl.slice(0, -1);
+        }
       } catch (_) {
         return null;
       }
